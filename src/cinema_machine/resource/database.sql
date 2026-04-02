@@ -1,9 +1,5 @@
 Use cinemamanagement;
 
-Drop Database cinemamanagement;
-Use shoesshop;
-
-
 -- Add Time_Slots --
 INSERT INTO time_slots(id, start_time) VALUES
 (800,'08:00'),(815,'08:15'),(830,'08:30'),(845,'08:45'),
@@ -25,11 +21,11 @@ INSERT INTO time_slots(id, start_time) VALUES
 (2400,'00:00'),(0015,'00:15'),(0030,'00:30'),(0045,'00:45');
 
 -- Add Ticket_Types --
-INSERT INTO ticket_types(name) VALUES 
-("2D Phụ Đề"), ("2D Lồng Tiếng"),
-("3D Phụ Đề"), ("3D Lồng Tiếng"),
-("IMAX 2D Phụ Đề"), ("IMAX 2D Lồng Tiếng"),
-("IMAX 3D Phụ Đề"), ("IMAX 3D Lồng Tiếng");
+INSERT INTO ticket_types(name, base_price) VALUES 
+("2D Phụ Đề", 100000), ("2D Lồng Tiếng", 120000), 
+("3D Phụ Đề", 150000), ("3D Lồng Tiếng", 180000),
+("IMAX 2D Phụ Đề", 200000), ("IMAX 2D Lồng Tiếng", 250000),
+("IMAX 3D Phụ Đề", 300000), ("IMAX 3D Lồng Tiếng", 350000);
 
 -- Add Theater_Rooms --
 INSERT INTO theater_rooms(name, seat_capacity) VALUES 

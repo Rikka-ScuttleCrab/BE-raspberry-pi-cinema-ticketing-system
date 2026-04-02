@@ -7,3 +7,4 @@ def import_models():
     from models.theaters.theaterroom import TheaterRoom
     from models.theaters.timeslot import TimeSlot
     from models.tickets.type import TicketType
+    from models.payments.invoice import PaymentInvoice
