@@ -8,6 +8,8 @@ def import_models():
     from models.theaters.theaterroom import TheaterRoom
     from models.theaters.timeslot import TimeSlot
     from models.others.voucher import Voucher
-    from models.tickets.booking import Booking
+    from models.tickets.order import Order
     from models.tickets.type import TicketType
     from models.tickets.ticket import Ticket
+    from models.users.role import Role
+    from models.users.user import User

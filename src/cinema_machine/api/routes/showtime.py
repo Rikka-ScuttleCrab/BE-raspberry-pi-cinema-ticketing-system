@@ -4,7 +4,7 @@ from typing import List
 from api.response import success_response, error_response
 from api.deps import get_db
 from api.schemas.showtime import ShowtimeTodayResponse
-from services.showtimeService import get_today_showtimes_with_booked_seats
+from services.showtimeService import get_today_showtimes_with_reserved_seats
 
 router = APIRouter(prefix="/api/v1/showtimes", tags=["Showtimes"])
 
@@ -14,7 +14,7 @@ def get_today_showtimes(movie_id: int, db: Session = Depends(get_db)):
     Lấy danh sách suất chiếu trong ngày của một phim cụ thể, 
     bao gồm thông tin phòng và các ghế đã được đặt.
     """
-    showtimes = get_today_showtimes_with_booked_seats(db, movie_id)
+    showtimes = get_today_showtimes_with_reserved_seats(db, movie_id)
     if not showtimes:
         return success_response(
             data=[], 

@@ -1,9 +1,8 @@
-from pydantic import BaseModel, Field
-from datetime import date
+from pydantic import BaseModel
 from typing import List, Optional
 from api.schemas.type import TicketTypeSchema
 
-class BookedSeatResponse(BaseModel):
+class ReservedSeatsResponse(BaseModel):
     id: int
     seat_row: str
     seat_number: int
@@ -17,7 +16,7 @@ class ShowtimeTodayResponse(BaseModel):
     ticket_type: Optional[TicketTypeSchema] = None
     theater_room_id: int
     theater_room_name: str
-    booked_seats: List[BookedSeatResponse]
+    reserved_seats: List[ReservedSeatsResponse]
 
     class Config:
         from_attributes = True

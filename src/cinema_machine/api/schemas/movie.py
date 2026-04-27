@@ -5,7 +5,6 @@ from api.schemas.type import TicketTypeSchema
 from api.schemas.trailer import TrailerSchema
 from api.schemas.poster import PosterSchema
 
-# Schema dùng chung
 class MovieBase(BaseModel):
     id: int
     title: str

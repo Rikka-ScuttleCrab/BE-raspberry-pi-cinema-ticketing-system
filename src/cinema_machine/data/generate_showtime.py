@@ -109,7 +109,7 @@ values = [
     for m, r, t, ts, d in showtimes
 ]
 
-sql = """INSERT INTO showtimes(movie_id, theater_room_id, type_ticket_id, time_slot_id, dayshow)
+sql = """INSERT INTO showtimes(movie_id, theater_room_id, ticket_type_id, time_slot_id, dayshow)
 VALUES
 """
 sql += ",\n".join(values) + ";"

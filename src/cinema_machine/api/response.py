@@ -1,16 +1,19 @@
 from fastapi.responses import JSONResponse
 import json
+from fastapi.encoders import jsonable_encoder
 
 
 def success_response(data: dict | list, message: str = "CALL API SUCCESS", status_code: int = 200):
+    data_jsonable = jsonable_encoder(data)
+    
     return JSONResponse(
         status_code=status_code,
-        content=json.loads(json.dumps({
+        content={
             "error": None,
             "message": message,
-            "data": data,
+            "data": data_jsonable,
             "status_code": status_code
-        }, indent=4))
+        }
     )
 
 

@@ -80,3 +80,66 @@ def get_showing_movies_service(db: Session):
         })
 
     return result
+
+def get_all_movies_service(db: Session, page: int = 1, page_size: int = 30):
+
+    today = date.today()
+    offset = (page - 1) * page_size
+
+    total = db.query(Movie).count()
+    
+    movies = (
+        db.query(Movie)
+        .options(
+            joinedload(Movie.posters),
+            joinedload(Movie.trailers),
+            joinedload(Movie.categories),
+        )
+        .order_by(Movie.id.desc())
+        .offset(offset)
+        .limit(page_size)
+        .all()
+    )
+
+    result = []
+
+    for m in movies:
+
+        # 🔥 status
+        if m.release_date > today:
+            status = "sap_chieu"
+        elif m.release_date <= today <= m.end_date:
+            status = "dang_chieu"
+        else:
+            status = "ngung_chieu"
+
+        result.append({
+            "id": m.id,
+            "title": m.title,
+            "actors": m.actors,
+            "age_rating": m.age_rating,
+            "duration_min": m.duration_min,
+            "description": m.description,
+            
+            "status": status,
+
+            "categories": [c.name for c in m.categories],
+            
+            "release_date": m.release_date,
+            "end_date": m.end_date,
+            
+            "posters": [
+                {"path": p.path}
+                for p in m.posters
+            ],
+
+            "trailers": [
+                {"path": t.path}
+                for t in m.trailers
+            ]
+        })
+
+    return {
+        "items": result,
+        "total": total
+    }

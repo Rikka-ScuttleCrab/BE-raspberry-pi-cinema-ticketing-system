@@ -1,9 +1,11 @@
 from pydantic import BaseModel
 from typing import List, Optional
+from  api.schemas.seat import SeatSelection
 
-class BookingRequest(BaseModel):
+
+class OrderRequest(BaseModel):
     showtime_id: int
     voucher_id: Optional[int] = None
     guest_name: str
-    info: str  # SĐT hoặc Email
-    seat_ids: List[int] # Danh sách ID ghế cần đặt
+    info: str
+    seats: List[SeatSelection]

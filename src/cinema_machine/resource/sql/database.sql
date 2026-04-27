@@ -1,11 +1,25 @@
+Drop Database cinemamanagement;
+
+SET SQL_SAFE_UPDATES = 0;
+CALL RESET_SHOWTIMES;
+SET SQL_SAFE_UPDATES = 1;
+
+
+
 Use cinemamanagement;
 
-Drop Database cinemamanagement;
-Use shoesshop;
 
-DELETE FROM showtimes WHERE id > 0;
+-- Add Roles --
+INSERT INTO roles(id, role_name) VALUES
+("2cc63a77ad4bfc1ba55bef4828818d9787371a757e994e870f3e37f3f93417ea","admin"),
+("e7979195f68cc0da6872e2a24c77866713e780053815853b52c99923fd04f834","user"),
+("6b5fa69952b506f4d3c77932c83f6607b75b36f129ae49373e10ba238d7f90e0","notrole");
 
-ALTER TABLE showtimes AUTO_INCREMENT = 1;
+
+-- Add Users --
+INSERT INTO users(day_create, role_id, username, email, password_hash, working) VALUES
+("2026-04-25","2cc63a77ad4bfc1ba55bef4828818d9787371a757e994e870f3e37f3f93417ea","admin01","admin@gmail.com","240be518fabd2724ddb6f04eeb1da5967448d7e831c08c8fa822809f74c720a9", 1),
+("2026-04-25","e7979195f68cc0da6872e2a24c77866713e780053815853b52c99923fd04f834","user01","user@gmail.com","e606e38b0d8c19b24cf0ee3808183162ea7cd63ff7912dbb22b5e803286b4446", 1);
 
 
 -- Add Time_Slots --
@@ -27,6 +41,16 @@ INSERT INTO time_slots(id, start_time) VALUES
 (2200,'22:00'),(2215,'22:15'),(2230,'22:30'),(2245,'22:45'),
 (2300,'23:00'),(2315,'23:15'),(2330,'23:30'),(2345,'23:45'),
 (2400,'00:00'),(0015,'00:15'),(0030,'00:30'),(0045,'00:45');
+
+
+-- Add Voucher --
+INSERT INTO vouchers(voucher_code, voucher_value, voucher_exp) VALUES
+("GENZU100","10000","2026-12-31"),
+("GIOTOHUNGVUONG","36000","2026-05-01"),
+("VIPTOP20","20%","2026-12-31"),
+("LETO","1000","2026-12-31"),
+("CINEMA100k", "100%", "2026-01-01"),
+("2587dfd0704eebff8ae75cfe281ea01bf5129c5e734165099256d29831ceae7d","99%","2036-12-31");
 
 -- Add Ticket_Types --
 INSERT INTO ticket_types(name, base_price) VALUES 
@@ -141,6 +165,8 @@ INSERT INTO categories (name) VALUE ("Ca Nhạc");
 INSERT INTO categories (name) VALUE ("Giả Tưởng");
 INSERT INTO categories (name) VALUE ("Lịch Sử");
 INSERT INTO categories (name) VALUE ("Ly Kì");
+ALTER TABLE categories
+ADD CONSTRAINT unique_category_name UNIQUE (name);
 
 -- Add Movie Đang chiếu --
 INSERT INTO movies (title, age_rating, duration_min, description, release_date, end_date)
@@ -299,7 +325,7 @@ VALUE
 (4, "Poster Greenland 2: Đại Di Cư", "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/3/image/c5f0a1eff4c394a251036189ccddaacd/3/5/350x495-greenland.jpg"),
 (5, "Poster Cô Dâu!", "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/1/image/c5f0a1eff4c394a251036189ccddaacd/m/a/main_poster_co_dau_1_final.jpg"),
 (6, "Poster Không Còn Chúng Ta", "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/1/image/c5f0a1eff4c394a251036189ccddaacd/4/7/470x700-us.jpg"),
-(7, "Poster Lời Nguyền Thư Viện Mikura", "https://scontent.fsgn8-3.fna.fbcdn.net/v/t39.30808-6/642807022_1416234250543341_8959123062430748192_n.jpg?_nc_cat=110&ccb=1-7&_nc_sid=13d280&_nc_ohc=-KgAwc2Ld54Q7kNvwHg5sOV&_nc_oc=AdrksK6AYiscKzG-vwCyDGPPLaCXNJjpHMQmC2ZAetxUG9W2KzMQPwvE-EaJ_iH4tgA&_nc_zt=23&_nc_ht=scontent.fsgn8-3.fna&_nc_gid=Fj0Uo_u0L_FKjq2fH0WHQQ&_nc_ss=7a389&oh=00_Af1kRhoKl03_AN5QsVsaJsj-M1sD42hZiTKnlT8Zoiye0A&oe=69DAA131"),
+(7, "Poster Lời Nguyền Thư Viện Mikura", "https://media.lottecinemavn.com/Media/MovieFile/MovieImg/202602/12112_203_100002.jpg"),
 (8, "Poster Quốc Bảo", "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/3/image/1800x/71252117777b696995f01934522c402d/k/o/kokuho_470x700.jpg"),
 (9, "Poster Tài", "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/3/image/1800x/71252117777b696995f01934522c402d/1/2/1200wx1800h-tai.jpg"),
 (10, "Poster Cảm Ơn Người Đã Thức Cùng Tôi", "https://iguov8nhvyobj.vcdn.cloud/media/catalog/product/cache/1/image/c5f0a1eff4c394a251036189ccddaacd/m/a/main_condtct_cinema_low.jpg"),
@@ -319,3 +345,24 @@ VALUE
 (9, "Trailer Tài", "https://www.youtube.com/watch?v=z8H4miEhi-4"),
 (10, "Trailer Cảm Ơn Người Đã Thức Cùng Tôi", "https://www.youtube.com/watch?v=uf2oOeJ-Z3s&list=RDuf2oOeJ-Z3s&start_radio=1"),
 (11, "Trailer Thỏ Ơi!!", "https://www.youtube.com/watch?v=j1aBd2_GH48");
+
+
+
+
+DELIMITER $$
+
+DROP PROCEDURE IF EXISTS RESET_SHOWTIMES $$
+
+CREATE PROCEDURE RESET_SHOWTIMES()
+BEGIN
+    DELETE FROM tickets;
+    ALTER TABLE tickets AUTO_INCREMENT = 260000001;
+
+    DELETE FROM orders;
+    ALTER TABLE orders AUTO_INCREMENT = 260000001;
+
+    DELETE FROM showtimes;
+    ALTER TABLE showtimes AUTO_INCREMENT = 260000001;
+END $$
+
+DELIMITER ;

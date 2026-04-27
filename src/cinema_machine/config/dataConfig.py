@@ -11,7 +11,11 @@ class Settings(BaseSettings):
     DB_HOST: str
     DB_PORT: int
     DB_NAME: str
-
+    
+    #Key_Role
+    SECRET_ROLE_KEY: str
+    DEFAULT_ROLE: str
+    
     # Gemini
     GEMINI_API_KEY: str
     GEMINI_BASE_URL: str

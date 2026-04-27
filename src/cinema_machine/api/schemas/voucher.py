@@ -1,10 +1,8 @@
 from pydantic import BaseModel
 
-
-class SeatResponse(BaseModel):
+class VoucherResponse(BaseModel):
     id: int
-    seat_row: str
-    seat_number: int
-
+    voucher_value: str
+    
     class Config:
         from_attributes = True

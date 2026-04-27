@@ -9,4 +9,4 @@ class Voucher(Base):
     voucher_value = Column(String(100), nullable=False)
     voucher_exp = Column(Date, nullable = False)
     
-    bookings = relationship("Booking", back_populates="voucher")
+    orders = relationship("Order", back_populates="voucher")
