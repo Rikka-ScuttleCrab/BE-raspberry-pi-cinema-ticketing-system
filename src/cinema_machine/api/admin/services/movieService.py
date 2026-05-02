@@ -4,6 +4,8 @@ from sqlalchemy.exc import OperationalError
 from models.movies.movie import Movie
 from models.movies.poster import Poster
 from models.movies.trailer import Trailer
+from models.movies.category import Category
+
 
 def get_all_movies_service(db: Session, page: int = 1, page_size: int = 30):
 
@@ -52,12 +54,18 @@ def get_all_movies_service(db: Session, page: int = 1, page_size: int = 30):
             "end_date": m.end_date,
             
             "posters": [
-                {"path": p.path}
+                {
+                    "name": p.name,
+                    "path": p.path
+                }
                 for p in m.posters
             ],
 
             "trailers": [
-                {"path": t.path}
+                {
+                    "name": t.name,
+                    "path": t.path
+                }
                 for t in m.trailers
             ]
         })
@@ -70,9 +78,21 @@ def get_all_movies_service(db: Session, page: int = 1, page_size: int = 30):
 def create_movie_admin_service(db: Session, data):
 
     try:
-        # 🔥 VALIDATE
-        validate_media(data.poster_path, data.poster_name, "poster")
-        validate_media(data.trailer_path, data.trailer_name, "trailer")
+        category_names = data.categories or []
+
+        existing_categories = []
+
+        if category_names:
+            existing_categories = db.query(Category).filter(
+                Category.name.in_(category_names)
+            ).all()
+
+            existing_names = [c.name for c in existing_categories]
+
+            not_found = set(category_names) - set(existing_names)
+
+            if not_found:
+                raise ValueError(f"Category không tồn tại: {list(not_found)}")
 
         movie = Movie(
             title=data.title,
@@ -83,24 +103,31 @@ def create_movie_admin_service(db: Session, data):
             release_date=data.release_date,
             end_date=data.end_date
         )
-
+        
+        if existing_categories:
+            movie.categories = existing_categories
+            
         db.add(movie)
         db.flush()
 
-        # ✅ POSTER
-        if data.poster_path and data.poster_name:
+        for p in data.posters:
+            if not p.name or not p.path:
+                raise ValueError("Poster phải có name và path")
+
             db.add(Poster(
-                path=data.poster_path,
-                name=data.poster_name,
-                movie_id=movie.id
+                movie_id=movie.id,
+                name=p.name,
+                path=p.path
             ))
 
-        # ✅ TRAILER
-        if data.trailer_path and data.trailer_name:
+        for t in data.trailers:
+            if not t.name or not t.path:
+                raise ValueError("Trailer phải có name và path")
+
             db.add(Trailer(
-                path=data.trailer_path,
-                name=data.trailer_name,
-                movie_id=movie.id
+                movie_id=movie.id,
+                name=t.name,
+                path=t.path
             ))
 
         db.commit()
@@ -111,8 +138,6 @@ def create_movie_admin_service(db: Session, data):
     except Exception:
         db.rollback()
         raise
-
-
 
 def update_movie_admin_service(db: Session, movie_id: int, data):
 
@@ -124,25 +149,6 @@ def update_movie_admin_service(db: Session, movie_id: int, data):
 
         update_data = data.model_dump(exclude_unset=True)
 
-        # 🔥 lấy existing
-        existing_poster = db.query(Poster).filter(Poster.movie_id == movie.id).first()
-        existing_trailer = db.query(Trailer).filter(Trailer.movie_id == movie.id).first()
-
-        # 🔥 VALIDATE
-        validate_media_update(
-            update_data.get("poster_path"),
-            update_data.get("poster_name"),
-            existing_poster,
-            "poster"
-        )
-
-        validate_media_update(
-            update_data.get("trailer_path"),
-            update_data.get("trailer_name"),
-            existing_trailer,
-            "trailer"
-        )
-
         # update field cơ bản
         for key in [
             "title", "age_rating", "duration_min",
@@ -151,37 +157,54 @@ def update_movie_admin_service(db: Session, movie_id: int, data):
             if key in update_data:
                 setattr(movie, key, update_data[key])
 
-        # 🔥 POSTER
-        if existing_poster:
-            if "poster_path" in update_data:
-                existing_poster.path = update_data["poster_path"]
+        if "posters" in update_data:
 
-            if "poster_name" in update_data:
-                existing_poster.name = update_data["poster_name"]
+            db.query(Poster).filter(
+                Poster.movie_id == movie.id
+            ).delete()
 
-        else:
-            if update_data.get("poster_path") and update_data.get("poster_name"):
+            for p in update_data["posters"]:
+                if not p["name"] or not p["path"]:
+                    raise ValueError("Poster phải có name và path")
+
                 db.add(Poster(
-                    path=update_data["poster_path"],
-                    name=update_data["poster_name"],
-                    movie_id=movie.id
+                    movie_id=movie.id,
+                    name=p["name"],
+                    path=p["path"]
                 ))
 
-        # 🔥 TRAILER
-        if existing_trailer:
-            if "trailer_path" in update_data:
-                existing_trailer.path = update_data["trailer_path"]
+        if "trailers" in update_data:
 
-            if "trailer_name" in update_data:
-                existing_trailer.name = update_data["trailer_name"]
+            db.query(Trailer).filter(
+                Trailer.movie_id == movie.id
+            ).delete()
 
-        else:
-            if update_data.get("trailer_path") and update_data.get("trailer_name"):
+            for t in update_data["trailers"]:
+                if not t["name"] or not t["path"]:
+                    raise ValueError("Trailer phải có name và path")
+
                 db.add(Trailer(
-                    path=update_data["trailer_path"],
-                    name=update_data["trailer_name"],
-                    movie_id=movie.id
+                    movie_id=movie.id,
+                    name=t["name"],
+                    path=t["path"]
                 ))
+                
+        if "categories" in update_data:
+
+            category_names = update_data["categories"]
+
+            existing_categories = db.query(Category).filter(
+                Category.name.in_(category_names)
+            ).all()
+
+            existing_names = [c.name for c in existing_categories]
+
+            not_found = set(category_names) - set(existing_names)
+
+            if not_found:
+                raise ValueError(f"Category không tồn tại: {list(not_found)}")
+
+        movie.categories = existing_categories
 
         db.commit()
         db.refresh(movie)
@@ -193,28 +216,3 @@ def update_movie_admin_service(db: Session, movie_id: int, data):
         raise
     
     
-    
-    
-    
-    
-    
-def validate_media(path, name, field_name="poster"):
-    if path and not name:
-        raise ValueError(f"{field_name}_name is required when {field_name}_path is provided")
-
-    if name and not path:
-        raise ValueError(f"{field_name}_path is required when {field_name}_name is provided")
-    
-
-def validate_media_update(path, name, existing, field_name="poster"):
-
-    # không truyền gì → OK
-    if path is None and name is None:
-        return
-
-    # nếu chưa có record mà chỉ truyền 1 field → lỗi
-    if not existing:
-        if path is None or name is None:
-            raise ValueError(
-                f"{field_name}_path và {field_name}_name phải có đủ khi tạo mới"
-            )

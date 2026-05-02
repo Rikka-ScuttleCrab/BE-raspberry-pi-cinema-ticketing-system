@@ -1,9 +1,5 @@
 Drop Database cinemamanagement;
 
-SET SQL_SAFE_UPDATES = 0;
-CALL RESET_SHOWTIMES;
-SET SQL_SAFE_UPDATES = 1;
-
 
 
 Use cinemamanagement;
@@ -366,3 +362,10 @@ BEGIN
 END $$
 
 DELIMITER ;
+
+
+
+SET SQL_SAFE_UPDATES = 0;
+CALL RESET_SHOWTIMES;
+SET SQL_SAFE_UPDATES = 1;
+

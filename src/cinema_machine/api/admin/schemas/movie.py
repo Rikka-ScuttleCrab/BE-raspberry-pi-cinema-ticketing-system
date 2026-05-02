@@ -1,8 +1,11 @@
 from pydantic import BaseModel, Field
 from typing import Optional, List
 from datetime import date
-from api.schemas.poster import PosterSchema
-from api.schemas.trailer import TrailerSchema
+
+
+class MediaItem(BaseModel):
+    name: str
+    path: str
 
 class MovieAdminResponse(BaseModel):
     id: int
@@ -17,8 +20,8 @@ class MovieAdminResponse(BaseModel):
     status: str
 
     categories: List[str] = Field(default_factory=list)
-    posters: List[PosterSchema] = Field(default_factory=list)
-    trailers: List[TrailerSchema] = Field(default_factory=list)
+    posters: List[MediaItem] = Field(default_factory=list)
+    trailers: List[MediaItem] = Field(default_factory=list)
 
     class Config:
         from_attributes = True
@@ -31,14 +34,12 @@ class MovieCreateAdmin(BaseModel):
 
     actors: Optional[str] = None
     description: Optional[str] = None
+    categories: List[str] = []
     release_date: Optional[date] = None
     end_date: Optional[date] = None
 
-    poster_path: Optional[str] = None
-    poster_name: Optional[str] = None
-
-    trailer_path: Optional[str] = None
-    trailer_name: Optional[str] = None
+    posters: List[MediaItem] = []
+    trailers: List[MediaItem] = []
 
 
 class MovieUpdateAdmin(BaseModel):
@@ -46,10 +47,11 @@ class MovieUpdateAdmin(BaseModel):
     age_rating: Optional[str] = None
     duration_min: Optional[int] = None
 
+    categories: List[str] = None
     actors: Optional[str] = None
     description: Optional[str] = None
     release_date: Optional[date] = None
     end_date: Optional[date] = None
 
-    poster_path: Optional[str] = None
-    trailer_path: Optional[str] = None
+    posters: List[MediaItem] = []
+    trailers: List[MediaItem] = []
