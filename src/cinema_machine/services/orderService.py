@@ -6,6 +6,7 @@ from models.tickets.order import Order
 from models.tickets.ticket import Ticket
 from models.theaters.showtime import Showtime
 from models.theaters.seat import Seat
+from models.others.voucher import Voucher
 from api.schemas.order import OrderRequest
 
 def create_order_service(db: Session, data: OrderRequest):
@@ -77,6 +78,26 @@ def create_order_service(db: Session, data: OrderRequest):
 
     base_price = float(showtime.ticket_type.base_price) if showtime.ticket_type else 0
     total_amount = base_price * len(target_seat_ids)
+
+    # ================= APPLY VOUCHER =================
+    if data.voucher_id:
+        voucher = db.query(Voucher).filter(Voucher.id == data.voucher_id).first()
+
+        if not voucher:
+            return {"error": "Voucher not found"}
+
+        # check hết hạn
+        if voucher.voucher_exp < date.today():
+            return {"error": "Voucher expired"}
+
+        value = voucher.voucher_value.strip().replace(" ", "")
+
+        if value.endswith("%"):
+            percent = float(value.replace("%", ""))
+            total_amount = int(total_amount * (1 - percent / 100))
+        else:
+            discount = float(value)
+            total_amount = max(0, total_amount - discount)
 
     try:
         new_order = Order(
