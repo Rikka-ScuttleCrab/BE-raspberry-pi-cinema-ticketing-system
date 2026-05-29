@@ -29,8 +29,8 @@ class Movie(Base):
         today = date.today()
 
         if today < self.release_date:
-            return "sap_chieu"
+            return "Sắp chiếu"
         elif self.release_date <= today <= self.end_date:
-            return "dang_chieu"
+            return "Đang chiếu"
         else:
-            return "da_ngung_chieu"
+            return "Ngưng chiếu"

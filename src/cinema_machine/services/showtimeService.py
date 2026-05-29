@@ -39,7 +39,10 @@ def get_today_showtimes_with_reserved_seats(db: Session, movie_id: int):
                 db.query(Seat)
                 .join(Ticket, Ticket.seat_id == Seat.id)
                 .join(Order, Ticket.order_id == Order.id)
-                .filter(Order.showtime_id == s.id)
+                .filter(
+                    Order.showtime_id == s.id,
+                    Ticket.status.in_(["USED","CONFIRMED"])
+                )
                 .all()
             )
 

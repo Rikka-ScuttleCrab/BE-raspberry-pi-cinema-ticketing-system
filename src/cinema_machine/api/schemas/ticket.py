@@ -10,6 +10,7 @@ class TicketDetailResponse(BaseModel):
     theater_room_name: str
     seat_name: str
     created_at: datetime
-
+    status: str
+    
     class Config:
         from_attributes = True

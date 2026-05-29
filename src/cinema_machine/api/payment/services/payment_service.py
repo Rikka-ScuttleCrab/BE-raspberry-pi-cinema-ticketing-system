@@ -11,6 +11,7 @@ from api.payment.config import CHECKSUM_KEY, API_KEY, CLIENT_ID, PAYOS_URL
 
 
 def create_payment_link(order_id: int, amount: int, db: Session):
+    
     order = db.query(Order).filter(Order.id == order_id).first()
     
     if not order:
@@ -25,7 +26,7 @@ def create_payment_link(order_id: int, amount: int, db: Session):
         "amount": amount,
         "description": "",
         "cancelUrl": "http://localhost:3000/cancel",
-        "returnUrl": "http://localhost:3000/success"
+        "returnUrl": "http://localhost:3000/success",
     }
 
     data_to_sign = {
@@ -33,7 +34,7 @@ def create_payment_link(order_id: int, amount: int, db: Session):
     "cancelUrl": data["cancelUrl"],
     "description": data["description"],
     "orderCode": data["orderCode"],
-    "returnUrl": data["returnUrl"]
+    "returnUrl": data["returnUrl"],
     }
 
     raw = build_raw_string(data_to_sign)
@@ -66,7 +67,7 @@ def get_payment_status_from_payos(order_id: int, db: Session):
     if not order or not order.payment_order_code:
         raise HTTPException(404, "Order not found or chưa tạo payment")
 
-    url = f"https://api-merchant.payos.vn/v2/payment-requests/{order.payment_order_code}"
+    url = PAYOS_URL + f"/{order.payment_order_code}"
 
     headers = {
         "x-client-id": CLIENT_ID,
@@ -81,35 +82,39 @@ def get_payment_status_from_payos(order_id: int, db: Session):
     return res.json()
 
 def process_payment_webhook(payload: dict, db: Session):
-    print("WEBHOOK PAYLOAD:", payload)
+    print("WEBHOOK RAW:", payload)
 
-    signature = payload.get("signature")
-    if not signature:
-        raise HTTPException(status_code=400, detail="Missing signature")
+    data = payload.get("data", {})
 
-    # 🔥 verify signature
-    if not verify_signature(payload, signature):
-        raise HTTPException(status_code=400, detail="Invalid signature")
+    order_code = data.get("orderCode")
+    payos_code = data.get("code") or payload.get("code")
 
-    order_code = payload.get("orderCode")
-    status = payload.get("status")
+    print("ORDER CODE:", order_code)
+    print("PAYOS CODE:", payos_code)
+    
+    
+    if not order_code:
+        return {"message": "Missing orderCode"}
 
     order = db.query(Order).filter(
         Order.payment_order_code == order_code
     ).first()
 
     if not order:
+        print("❌ Order not found in DB")
         return {"message": "Order not found"}
 
-    # 🔥 idempotent
+    print("DB order_code:", order.payment_order_code)
+    print("Webhook order_code:", order_code)
+    
+    # idempotent
     if order.status == "PAID":
         return {"message": "Already processed"}
 
-    if status == "PAID":
+    if payos_code == "00":
         order.status = "PAID"
         order.paid_at = datetime.datetime.utcnow()
 
-        # confirm ticket
         for ticket in order.tickets:
             ticket.status = "CONFIRMED"
 
@@ -117,6 +122,8 @@ def process_payment_webhook(payload: dict, db: Session):
         order.status = "FAILED"
 
     db.commit()
+
+    print("✅ UPDATED ORDER:", order.id)
 
     return {"message": "OK"}
 

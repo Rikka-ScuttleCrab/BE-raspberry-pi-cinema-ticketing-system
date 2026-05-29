@@ -9,7 +9,7 @@
 import uvicorn
 from core.app import app
 from config.serverConfig import HOST, PORT
-
+    
 if __name__ == "__main__":
     # Thay vì dùng HOST/PORT từ config, bạn có thể ghi đè trực tiếp 0.0.0.0 
     # để các thiết bị khác (Emulator/Mobile) có thể kết nối.

@@ -139,3 +139,32 @@ def create_order_service(db: Session, data: OrderRequest):
     except Exception as e:
         db.rollback()
         return {"error": str(e)}
+
+
+def get_order_service(db: Session, order_id: int):
+
+    order = (
+        db.query(Order)
+        .options(
+            joinedload(Order.voucher)
+        )
+        .filter(Order.id == order_id)
+        .first()
+    )
+
+    if not order:
+        return None
+
+    return {
+        "order_id": order.id,
+        "payment_order_code": order.payment_order_code,
+        "guest_name": order.guest_name,
+        
+        "voucher_code": (
+            order.voucher.voucher_code
+            if order.voucher else None
+        ),
+        "paid_at": order.paid_at,
+        "total_amount": int(order.total_amount),
+
+    }

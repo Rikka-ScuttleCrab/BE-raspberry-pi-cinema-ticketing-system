@@ -4,6 +4,8 @@ from api.schemas.category import CategorySchema
 from api.schemas.type import TicketTypeSchema
 from api.schemas.trailer import TrailerSchema
 from api.schemas.poster import PosterSchema
+from datetime import date
+
 
 class MovieBase(BaseModel):
     id: int
@@ -27,6 +29,8 @@ class MovieDetailResponse(BaseModel):
     description: Optional[str]
     age_rating: Optional[str]
     duration_min: int
+    release_date: date
+    end_date: date
     status: str
 
     categories: List[str] = Field(default_factory=list)
@@ -34,6 +38,17 @@ class MovieDetailResponse(BaseModel):
     posters: List[PosterSchema] = Field(default_factory=list)
     
     trailers: List[TrailerSchema] = Field(default_factory=list)
+    
+    recommendations: List[RecommendationSchema] = Field(default_factory=list)
+    
+    class Config:
+        from_attributes = True
+        
+class RecommendationSchema(BaseModel):
+    movie_id: int
+    title: str
+    score: float
+    
     
     class Config:
         from_attributes = True

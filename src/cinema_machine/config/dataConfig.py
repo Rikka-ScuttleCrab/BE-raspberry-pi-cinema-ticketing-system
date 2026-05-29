@@ -32,6 +32,9 @@ class Settings(BaseSettings):
     VNPAY_URL: str
     VNPAY_HASH_SECRET: str
     VNPAY_TMN_CODE: str
+    
+    #TEMPLATE
+    TEMPLATE_DIR: str
 
     model_config = SettingsConfigDict(
         env_file=BASE_DIR / ".env",

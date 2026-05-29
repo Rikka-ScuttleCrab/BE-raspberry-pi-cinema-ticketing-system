@@ -88,6 +88,22 @@ def create_showtime_service(db: Session, data):
     if not movie:
         raise ValueError("Movie not found")
 
+    if data.dayshow < movie.release_date:
+
+        raise ValueError(
+            "Ngày chiếu nhỏ hơn ngày khởi chiếu của phim"
+        )
+
+    if data.dayshow > movie.end_date:
+
+        raise ValueError(
+            "Ngày chiếu vượt quá ngày kết thúc của phim"
+        )
+    if data.dayshow < today:
+
+        raise ValueError(
+            "Không thể tạo suất chiếu trong quá khứ"
+        )
     ticket = db.query(TicketType).filter(
         TicketType.id == data.ticket_type_id
     ).first()
@@ -133,7 +149,7 @@ def update_showtime_service(db: Session, showtime_id: int, data):
     ).first()
 
     if existed:
-        raise ValueError("Showtime already exists in this room")
+        raise ValueError("Suất chiếu đã tồn tại trong phòng này")
 
     now = datetime.now()
     today = now.date()

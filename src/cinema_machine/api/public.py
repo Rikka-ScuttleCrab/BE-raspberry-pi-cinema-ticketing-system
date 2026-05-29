@@ -7,7 +7,8 @@ from api.routes import (
     voucher,
     ticket,
     auth,
-    order
+    order,
+    recommendation
 )
 
 router = APIRouter()
@@ -20,3 +21,4 @@ router.include_router(order.router)
 router.include_router(voucher.router)
 router.include_router(ticket.router)
 router.include_router(auth.router)
+router.include_router(recommendation.router)

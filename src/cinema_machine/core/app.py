@@ -4,7 +4,7 @@ from api.admin import admin
 from api.payment import payment
 from core.startup import run_startup
 from fastapi.middleware.cors import CORSMiddleware
-
+from background.scheduler import (start_cleanup_scheduler)
 
 app = FastAPI(
     title="Cinema Machine AIoT API",
@@ -24,7 +24,9 @@ app.add_middleware(
 @app.on_event("startup")
 def startup_event():
     run_startup()
-
+    start_cleanup_scheduler()
+    
+    
 app.include_router(public.router)
 app.include_router(admin.router)
 app.include_router(payment.router)

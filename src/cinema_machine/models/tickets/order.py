@@ -14,6 +14,7 @@ class Order(Base):
     voucher_id = Column(Integer, ForeignKey('vouchers.id'))
 
     guest_name = Column(String(255))
+    
     info = Column(String(255))
 
     total_amount = Column(Numeric(10, 2))

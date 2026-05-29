@@ -32,14 +32,24 @@ def get_movie_by_id_service(db: Session, movie_id: int):
             c.name
             for c in movie.categories
         ],
-
+        
+        "release_date": movie.release_date,
+        
+        "end_date": movie.end_date,
+        
         "posters": [
-            {"path": p.path}
+            {
+                "name": p.name,
+                "path": p.path
+            }
             for p in movie.posters
         ],
 
         "trailers": [
-            {"path": t.path}
+            {   
+                "name": t.name,
+                "path": t.path
+            }
             for t in movie.trailers
         ],
     }
@@ -75,8 +85,14 @@ def get_showing_movies_service(db: Session):
             "actors": m.actors,
             "duration_min": m.duration_min,
             "status": m.status,
-            "posters": [{"path": p.path} for p in m.posters],
-            "trailers": [{"path": p.path} for p in m.trailers],
+            "posters": [{
+                "name": p.name,
+                "path": p.path
+                } for p in m.posters],
+            "trailers": [{
+                "name": p.name,
+                "path": p.path
+                } for p in m.trailers],
         })
 
     return result
@@ -107,11 +123,11 @@ def get_all_movies_service(db: Session, page: int = 1, page_size: int = 30):
 
         # 🔥 status
         if m.release_date > today:
-            status = "sap_chieu"
+            status = "Sắp chiếu"
         elif m.release_date <= today <= m.end_date:
-            status = "dang_chieu"
+            status = "Đang chiếu"
         else:
-            status = "ngung_chieu"
+            status = "Ngừng chiếu"
 
         result.append({
             "id": m.id,

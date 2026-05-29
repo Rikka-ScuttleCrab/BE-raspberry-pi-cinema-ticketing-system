@@ -1,0 +1,29 @@
+<h2>Vé xem phim của bạn</h2>
+
+{% for ticket in tickets %}
+
+<div style="margin-bottom:20px">
+
+    <p>
+        <b>Movie:</b>
+        {{ ticket.movie }}
+    </p>
+
+    <p>
+        <b>Seat:</b>
+        {{ ticket.seat }}
+    </p>
+
+    <p>
+        <b>Showtime:</b>
+        {{ ticket.showtime }}
+    </p>
+
+    <img
+        src="{{ ticket.qr }}"
+        width="200"
+    />
+
+</div>
+
+{% endfor %}
